@@ -1,7 +1,4 @@
-# hw-studio licence (DRAFT)
-
-> **DRAFT, NOT LEGAL ADVICE.** This text was drafted for the copyright holder's review and has not been
-> checked by a lawyer. It may change before it is final.
+# hw-studio licence
 
 Copyright (c) 2026 Pinka. All rights reserved.
 
