@@ -1,0 +1,109 @@
+hw-studio
+This product includes software ported from third-party projects, and uses
+third-party packages listed below.
+
+--------------------------------------------------------------------------------
+openFPGALoader
+https://github.com/trabucayre/openFPGALoader
+Copyright (C) 2019 Gwenhael Goavec-Merou <gwenhael.goavec-merou@trabucayre.com>
+Licensed under the Apache License, Version 2.0
+(http://www.apache.org/licenses/LICENSE-2.0). A copy of the licence is in
+LICENSES/Apache-2.0.txt.
+
+The ported files below keep this copyright notice in their header comment and
+say what was changed. No openFPGALoader binaries are distributed: the earlier
+openFPGALoader WebUSB/WASM bundle (with LGPL libftdi1 and libusb linked in) was
+removed when these TypeScript ports replaced it (#99).
+
+Ported files:
+- lib/jtag/gowin/fs.ts: from src/fsparser.cpp (Gowin .fs bitstream parser).
+  Translated to TypeScript; errors are thrown instead of printed, and the
+  header is returned as typed fields.
+- lib/jtag/ftdi-mpsse.ts: from src/ftdiJtagMPSSE.cpp (FTDI MPSSE JTAG: Sipeed
+  workarounds, TMS/TDI/TDO shifts, clock-only commands) and src/ftdipp_mpsse.cpp
+  (MPSSE init, clock divisor, command buffering and reads).
+  Translated to TypeScript over our USB transport instead of libftdi; the FTDI
+  modem-status bytes are stripped here; the last bit of a shift is indexed by
+  its absolute position, which fixes 9-bit shifts with `last`.
+- lib/jtag/tap.ts: modelled on src/jtag.cpp (TAP reset and state moves, IR/DR
+  shifts, scan-chain detection) and the Gowin READ_IDCODE opcode from
+  src/gowin.cpp. Rewritten in TypeScript: state paths come from a search over
+  the IEEE 1149.1 transition table, reads always drive TDI (a Sipeed firmware
+  workaround), and results are plain-language verdicts.
+- lib/jtag/gowin/gw2a.ts: from src/gowin.cpp (GW2A opcodes and status bits,
+  send_command, readReg32, gw2a_force_state, enableCfg/disableCfg, pollFlag,
+  eraseSRAM, writeSRAM, displayReadReg). Translated to TypeScript: polls stop
+  after a time limit, failures return plain-language verdicts with a hint
+  instead of printing, and progress goes to a callback. SRAM only.
+- lib/jtag/gowin/gw2a-spi.ts: from src/gowin.cpp (Gowin::spi_put for the GW2A
+  JTAG-to-SPI bridge, IR 0x16; prepare_flash_access, post_flash_access).
+  Translated to TypeScript; the read path pads its extra byte with zeros.
+- lib/jtag/spi-flash.ts: erase/program/verify order after src/spiFlash.cpp
+  (SPIFlash::erase_and_prog). Rewritten in TypeScript over a generic SPI bus;
+  writes are refused without an explicit confirmFlash.
+
+--------------------------------------------------------------------------------
+usb (node-usb)
+https://github.com/node-usb/node-usb
+Copyright (c) 2012 Nonolith Labs, LLC
+Licensed under the MIT License (node_modules/usb/LICENSE).
+
+Used only on the Node side (lib/jtag/transport-node.ts: the MCP `program` tool's
+"native-ts" method, the `npm run jtag` harness, and the local server's USB
+device listing). It is installed from npm as a dependency and is not bundled
+into the browser app.
+
+--------------------------------------------------------------------------------
+libusb
+https://github.com/libusb/libusb
+Licensed under the GNU Lesser General Public License, version 2.1 or later
+(node_modules/usb/libusb/COPYING).
+
+Ships inside the `usb` package's native Node addon, which Node loads at run
+time; Node side only. hw-studio does not modify or vendor libusb. Its source
+comes with the `usb` package (node_modules/usb/libusb), and the addon can be
+rebuilt from it with node-gyp, so it can be replaced with a modified libusb.
+The browser app uses Chrome's WebUSB and contains no libusb.
+
+--------------------------------------------------------------------------------
+esp32-camera
+https://github.com/espressif/esp32-camera
+Copyright 2015-2016 Espressif Systems (Shanghai) PTE LTD
+Licensed under the Apache License, Version 2.0
+(http://www.apache.org/licenses/LICENSE-2.0). A copy of the licence is in
+LICENSES/Apache-2.0.txt.
+
+The OV2640 and OV5640 register tables in blocks/ov_sccb_init/data/*.hex are
+generated from sensors/private_include/ov2640_settings.h and
+ov5640_settings.h (and the init and window sequences in sensors/ov2640.c and
+ov5640.c) of this project. Only register addresses and values were taken, in
+a new file format, with the sequence reassembled for 320x240 / 640x480 RGB565
+and Y8 output.
+
+--------------------------------------------------------------------------------
+CSI2Rx (verilog_cores)
+https://github.com/gatecat/CSI2Rx
+Copyright (c) 2016-2018 David Shah
+Licensed under the MIT License; the full licence text is kept in the header of
+each adapted file.
+
+Adapted files:
+- blocks/dphy_byte_align/dphy_byte_align.v: from verilog_cores/phy/byte_aligner.v.
+- blocks/csi2_lane_align/csi2_lane_align.v: from verilog_cores/phy/word_combiner.v.
+- blocks/csi2_packet/csi2_packet.v: from verilog_cores/csi/header_ecc.v and
+  verilog_cores/csi/rx_packet_handler.v.
+Each file says what was changed for hw-studio.
+
+--------------------------------------------------------------------------------
+PicoRV32
+https://github.com/YosysHQ/picorv32
+Copyright (C) 2015 - 2021 Claire Xenia Wolf <claire@yosyshq.com>
+Licensed under the ISC License (blocks/cpu_picorv32/LICENSE).
+
+blocks/cpu_picorv32/cpu_picorv32.v contains picorv32.v from commit
+ef203c2b0a3fb793280f5114941416c425c5b461, with its copyright and permission
+notice kept at the top of that part. The only change is a hw_cpu_picorv32_
+prefix on every module name, made by scripts/vendor-picorv32.mjs, so the
+library copy can't clash with a PicoRV32 imported into the same project.
+Projects that use the block get the file, notice included, in
+src/blocks/lib/.
