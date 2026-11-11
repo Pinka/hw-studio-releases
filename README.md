@@ -12,7 +12,7 @@ This repository holds release notes, checksums and licence files only. The packa
 You need **Node.js 20 or newer** (https://nodejs.org). Then, in any folder:
 
 ```
-npx --yes https://github.com/Pinka/hw-studio-releases/releases/download/v0.1.0/hw-studio-0.1.0.tgz serve
+npx --yes https://github.com/Pinka/hw-studio-releases/releases/download/v0.1.2/hw-studio-0.1.2.tgz serve
 ```
 
 Use the version the studio shows on its "Connect the local companion" page; it must match the studio's
@@ -52,8 +52,8 @@ Settings, the token and recent projects are in `~/.hw-studio`.
 Each release lists the SHA-256 of its package, also in `SHA256SUMS`:
 
 ```
-curl -LO https://github.com/Pinka/hw-studio-releases/releases/download/v0.1.0/hw-studio-0.1.0.tgz
-sha256sum hw-studio-0.1.0.tgz      # Windows: certutil -hashfile hw-studio-0.1.0.tgz SHA256
+curl -LO https://github.com/Pinka/hw-studio-releases/releases/download/v0.1.2/hw-studio-0.1.2.tgz
+sha256sum hw-studio-0.1.2.tgz      # Windows: certutil -hashfile hw-studio-0.1.2.tgz SHA256
 ```
 
 ## Licence
